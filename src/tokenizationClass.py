@@ -2,11 +2,12 @@
 # Se agrega importación del SQL LISTENER para obtener
 # Las funciones básicas de SQL
 # Manegador de los datos que se van a ejectutar
-from dataCM import cliManager
+from cliManager import cliManager
 # Se agrega fileManager este es el archivo que se encargará del manejo de la db (Sus archivos)
-from dbFile import fileManager
+from fileManager import fileManager
 # Estructura de como se imprimen los archivos los datos a utilizar y visualizacion de los mismos
-from dbPrint import printerClass
+from printerClass import printerClass
+
 from sqlListener import sqlListener
 
 if __name__ is not None and "." in __name__:
