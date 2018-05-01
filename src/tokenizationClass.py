@@ -78,10 +78,11 @@ class tokenizationClass(sqlListener):
             type = dataCM.validateCreateTableTypes(self.getTokenValue(column.type_name().name()[0]))
             key = self.getTokenValue(column.column_name())
             cols.append((key, type))
-        
+
         if dbFile.createTableFS(table_name, cols):
             print("SE HA CREADO LA TABLA " + table_name + " EXITOSAMENTE")
         pass
+
     # !CREATE TABLE
 
     # SHOW TABLES
@@ -104,9 +105,10 @@ class tokenizationClass(sqlListener):
                 check = True
         if (check):
             (dbFile.renameFS(table_name_old, table_name_new))
+
     # !ALTER TABLE
 
-     # INSERT
+    # INSERT
     def enterInsert_stmt(self, ctx: sqlParser.Insert_stmtContext):
 
         tableName = self.getTokenValue(ctx.table_name())
@@ -157,4 +159,97 @@ class tokenizationClass(sqlListener):
             print("INSERT A " + tableName + " EXITOSO")
         else:
             dataCM.raiseError(False, "NO SE PUEDE INSERTAR EN UNA TUPLA VACÍA")
+
     # !INSERT
+
+    # SELECT SECTION
+    def enterSelect_core(self, ctx: sqlParser.Select_coreContext):
+
+        tableName = self.getTokenValue(ctx.table_or_subquery()[0].table_name())
+
+        tableStructure = eval(dbFile.readTableFS(tableName, "structure"))
+        tableData = eval(dbFile.readTableFS(tableName, "data"))
+        colNames = [col[0] for col in tableStructure]
+
+        # check if table exists in database
+        if tableName not in dbFile.showTablesFS():
+            raise ValueError("LA TABLA" + tableName + " NO EXISTE EN " + dbFile.currentDatabase)
+
+        dataCM.setSavedStructure(tableStructure)
+
+        # insert target columns
+        targets = [self.getTokenValue(target) for target in ctx.result_column()]
+
+        if "*" in targets:
+            dataCM.setSavedData(tableData)
+        else:
+
+            if all(value in colNames for value in targets):
+                targetsIndex = [colNames.index(elem) for elem in targets]
+                filteredData = []
+                for tup in tableData:
+                    filteredValue = []
+                    for col in targetsIndex:
+                        filteredValue.append(tup[col])
+                    filteredData.append(tuple(filteredValue))
+                dataCM.setSavedData(filteredData)
+
+            else:
+                raise ValueError("AL MENOS UNA DE LAS TABLAS OBJETIVO NO EXISTE EN" + tableName)
+
+        # Exit a parse tree produced by sqlParser#select_core.
+
+    def exitSelect_core(self, ctx: sqlParser.Select_coreContext):
+        dbPrint.print_table(dataCM.isSavedData, [col[0] for col in dataCM.structureSaved])
+        print(dataCM.isSavedData)
+
+    # !SELECT SECTION
+
+    # SELECT REDUCE (WHERE)
+    def enterExprComparisonSecond(self, ctx: sqlParser.ExprComparisonSecondContext):
+        if dataCM.multiples:
+            pass
+        else:
+            builtCondition = dataCM.queryWhereStringCLBuilder(
+                [col[0] for col in dataCM.structureSaved].index(self.getTokenValue(ctx.expr()[0])),
+                self.getTokenValue(ctx.expr()[1]),
+                self.getTokenValue(ctx.children[1])
+            )
+            dataCM.setSavedData(dataCM.handleNullValue(dataCM.isSavedData, builtCondition))
+
+    # !SELECT REDUCE (WHERE)
+
+    # SELECT AND
+    def enterExprAnd(self, ctx: sqlParser.ExprAndContext):
+        dataCM.multiples = True
+        conditions = ctx.expr()
+        reducedData = []
+
+        for condition in conditions:
+            builtCondition = dataCM.queryWhereStringCLBuilder(
+                [col[0] for col in dataCM.structureSaved].index(self.getTokenValue(condition.expr()[0])),
+                self.getTokenValue(condition.expr()[1]),
+                self.getTokenValue(condition.children[1])
+            )
+            reducedData.append(dataCM.handleNullValue(dataCM.isSavedData, builtCondition))
+
+        dataCM.setSavedData(dataCM.handleAndStmt(reducedData))
+
+    # !SELECT AND 
+
+    # SELECT OR
+    def enterExprOr(self, ctx: sqlParser.ExprOrContext):
+        dataCM.multiples = True
+        conditions = ctx.expr()
+        reducedData = []
+
+        for condition in conditions:
+            builtCondition = dataCM.queryWhereStringCLBuilder(
+                [col[0] for col in dataCM.structureSaved].index(self.getTokenValue(condition.expr()[0])),
+                self.getTokenValue(condition.expr()[1]),
+                self.getTokenValue(condition.children[1])
+            )
+            reducedData.append(dataCM.handleNullValue(dataCM.isSavedData, builtCondition))
+
+        dataCM.setSavedData(dataCM.handleOrStmt(reducedData))
+    # !SELECT OR
