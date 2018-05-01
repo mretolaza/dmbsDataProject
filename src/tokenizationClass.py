@@ -78,10 +78,10 @@ class tokenizationClass(sqlListener):
             type = dataCM.validateCreateTableTypes(self.getTokenValue(column.type_name().name()[0]))
             key = self.getTokenValue(column.column_name())
             cols.append((key, type))
+        
         if dbFile.createTableFS(table_name, cols):
             print("SE HA CREADO LA TABLA " + table_name + " EXITOSAMENTE")
         pass
-
     # !CREATE TABLE
 
     # SHOW TABLES
