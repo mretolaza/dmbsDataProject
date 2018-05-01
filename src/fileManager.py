@@ -1,10 +1,10 @@
-#Se llama a archivo que crea los files de la base de 
-#datos, este es una carpeta existente dentro de la carpeta file
+# Se llama a archivo que crea los files de la base de
+# datos, este es una carpeta existente dentro de la carpeta file
+# https://docs.python.org/3.3/library/collections.html
+# Se importa JSON LIB
+import json
+
 from createFile import createFile
-#https://docs.python.org/3.3/library/collections.html
-import collections
-#Se importa JSON LIB
-import json 
 
 
 class fileManager():
@@ -33,7 +33,8 @@ class fileManager():
 
     def createTableFS(self, table_name, table_structure):
         if (self.currentDatabase):
-            self.createFile.create_folder(self.currentDatabase + "/" + table_name)  # Crea carpeta a la cual pertenece la tabla
+            self.createFile.create_folder(
+                self.currentDatabase + "/" + table_name)  # Crea carpeta a la cual pertenece la tabla
             self.createFile.createWrite_file(
                 self.currentDatabase + "/" + table_name + "/" + table_name + self.dbSchemaTerm,
                 json.dumps(table_structure))  # Crea la "shema" con la base y estrucurta de la tabla
@@ -53,12 +54,17 @@ class fileManager():
     def getDatabaseFS(self):
         return self.currentDatabase
 
-    #Se crea estrucutura JSON con la cual se guardarán los datos en la db 
+    # Se crea estrucutura JSON con la cual se guardarán los datos en la db
     def insertTableFS(self, table, data):
         self.createFile.createWrite_file(self.currentDatabase + "/" + table + "/" + table + self.dbInfoTerm, data)
-    #Se aplican  los mismos parámetros para la lectura de la db 
+
+    # Se aplican  los mismos parámetros para la lectura de la db
     def readTableFS(self, table, fileType):
-        return self.createFile.read_file(self.currentDatabase + "/" + table + "/" + table + (self.dbInfoTerm if fileType == "data" else self.dbSchemaTerm))
-    #Se aplican los mismos parámetros para "re-nombramiento"
+        return self.createFile.read_file(self.currentDatabase + "/" + table + "/" + table + (
+            self.dbInfoTerm if fileType == "data" else self.dbSchemaTerm))
+
+    # Se aplican los mismos parámetros para "re-nombramiento"
     def renameFS(self, table_name_old, table_name_new):
-        return self.createFile.rename_files(self.currentDatabase + "/", self.currentDatabase + "/" + table_name_old + "/", table_name_old, table_name_new)
+        return self.createFile.rename_files(self.currentDatabase + "/",
+                                            self.currentDatabase + "/" + table_name_old + "/", table_name_old,
+                                            table_name_new)

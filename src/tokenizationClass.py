@@ -1,18 +1,13 @@
-#https://docs.python.org/2/library/pdb.html
-import pdb 
-#Se agrega importación del SQL LISTENER para obtener 
-#Las funciones básicas de SQL 
-from sqlListener import sqlListener
-#Se agrega fileManager este es el archivo que se encargará
-#Del manejo de la db (Sus archivos)
+# https://docs.python.org/2/library/pdb.html
+# Se agrega importación del SQL LISTENER para obtener
+# Las funciones básicas de SQL
+# Manegador de los datos que se van a ejectutar
+from dataCM import cliManager
+# Se agrega fileManager este es el archivo que se encargará del manejo de la db (Sus archivos)
 from dbFile import fileManager
-#Manegador de los datos que se van a ejectutar
-#
-from dataCM import cliManager 
-#Estructura de como se imprimen los archivos 
-#los datos a utilizar y visualizacion de los mismos 
-from dbPrint import printerClass 
-
+# Estructura de como se imprimen los archivos los datos a utilizar y visualizacion de los mismos
+from dbPrint import printerClass
+from sqlListener import sqlListener
 
 if __name__ is not None and "." in __name__:
     from .sqlParser import sqlParser
@@ -20,24 +15,24 @@ else:
     from sqlParser import sqlParser
 
 # Se inicializan las clases a utilizar 
-dbFile   = fileManager()
-dataCM   = cliManager()
-dbPrint  = printerClass()
+dbFile = fileManager()
+dataCM = cliManager()
+dbPrint = printerClass()
 
 
 class tokenizationClass(sqlListener):
     def __init__(self):
         pass
 
-    #Se ejecutan las clases de SQL LISTENER SQL PARSER 
+    # Se ejecutan las clases de SQL LISTENER SQL PARSER
     def exitR(self, ctx):
         print("Bienvenido, el ingreso de cualquier valor SQL ha sido validado")
 
     def getTokenValue(self, name):
         return name.getText()
 
-        #Los comentarios se colocan con el nombre 
-        #que deben de ser ejecutados 
+        # Los comentarios se colocan con el nombre
+        # que deben de ser ejecutados
 
     # CREATE DATABASE
     def enterCreate_database_stmt(self, ctx: sqlParser.Create_database_stmtContext):
@@ -47,6 +42,7 @@ class tokenizationClass(sqlListener):
     def exitCreate_database_stmt(self, ctx: sqlParser.Create_database_stmtContext):
         print("LA BASE DE DATOS SE HA CREADO SATISFACTORIAMENTE")
         pass
+
     # !CREATE DATABASE
 
     # SHOW DATABASE
@@ -54,6 +50,7 @@ class tokenizationClass(sqlListener):
         print("BASES DE DATOS DEL SISTEMA:")
         print(dbFile.showDatabasesFS())
         pass
+
     # !SHOW DATABASE
 
     # USE DATABASE
@@ -61,6 +58,7 @@ class tokenizationClass(sqlListener):
         datbase_name = self.getTokenValue(ctx.database_name())
         dbFile.useDatabaseFS(datbase_name)
         print("BASE DE DATOS ACTUAL CAMBIO A: " + datbase_name)
+
     # !USE DATABASE
 
     # DROP DATABASE
@@ -68,6 +66,7 @@ class tokenizationClass(sqlListener):
         database_name = self.getTokenValue(ctx.database_name())
         dbFile.removeDatabaseFS(database_name)
         pass
+
     # !DROP DATABASE
 
     # CREATE TABLE
@@ -81,6 +80,7 @@ class tokenizationClass(sqlListener):
         if dbFile.createTableFS(table_name, cols):
             print("SE HA CREADO LA TABLA " + table_name + " EXITOSAMENTE")
         pass
+
     # !CREATE TABLE
 
     # SHOW TABLES
@@ -88,9 +88,10 @@ class tokenizationClass(sqlListener):
         print("TABLAS EN: " + dbFile.getDatabaseFS())
         print(dbFile.showTablesFS())
         pass
+
     # !SHOW TABLES
 
-     # ALTER TABLE
+    # ALTER TABLE
     def enterAlter_table_stmt(self, ctx: sqlParser.Alter_table_stmtContext):
         # se llama al show tables
         table_name_old = self.getTokenValue(ctx.table_name())

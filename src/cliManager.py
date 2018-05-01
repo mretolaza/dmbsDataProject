@@ -1,10 +1,5 @@
-import pdb
-from datetime import date
-import re
-from collections import OrderedDict
-
 class cliManager():
-    #Tipos de datos permitidos en el programa
+    # Tipos de datos permitidos en el programa
     isAllowedDataType = ['INT', 'FLOAT', 'DATE', 'CHAR']
     isSavedData = []
     cacheLogData = []
@@ -62,12 +57,12 @@ class cliManager():
                 return str(value)
             except Exception:
                 print("ERROR" + value + " NO ES UN TIPO DE DATO VARCHAR")
-         if type == "DATE":
+        if type == "DATE":
             try:
                 return str(value)
             except Exception:
                 print("ERROR" + value + " NO ES UN TIPO DE DATO DATE")
-        
+
     def generateSpecificColOrder(self, cols, structure):
         return [any(e[0] == col for e in structure) for col in cols]
 
@@ -99,8 +94,8 @@ class cliManager():
                 pass
         return returnData
 
-    def handleAndStmt(self,listas):
+    def handleAndStmt(self, listas):
         return [element for element in listas[0] if element in listas[1]]
 
-    def handleOrStmt(self,listas):
+    def handleOrStmt(self, listas):
         return listas[1] + [x for x in listas[0] if x not in listas[1]]

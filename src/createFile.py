@@ -1,7 +1,7 @@
-#Se importan las librerías que se van a utilizar 
-#https://docs.python.org/2/library/os.html
+# Se importan las librerías que se van a utilizar
+# https://docs.python.org/2/library/os.html
 import os
-#https://docs.python.org/3/library/shutil.html
+# https://docs.python.org/3/library/shutil.html
 import shutil
 
 data_folder = "DATABASES/"
@@ -52,19 +52,19 @@ class createFile():
             return True
         return False
 
-    #Re nombra a los folders que se le han seleccionado
+    # Re nombra a los folders que se le han seleccionado
     def rename_file(self, path, newPath):
         if os.path.exists(data_folder + path):
             os.rename(data_folder + path, data_folder + newPath)
             return True
         return False
 
-    #Re nombra a los folders que se le han especificado
+    # Re nombra a los folders que se le han especificado
     def rename_files(self, folder_path, path, old_name, new_name):
-        for name in  os.listdir(data_folder + path):
-           indexType = name.index('.')
-           os.rename(data_folder + path + name, data_folder + path + new_name+name[indexType:])
+        for name in os.listdir(data_folder + path):
+            indexType = name.index('.')
+            os.rename(data_folder + path + name, data_folder + path + new_name + name[indexType:])
         for folder in os.listdir(data_folder + folder_path):
-            print (new_name)
+            print(new_name)
             if (folder == old_name):
                 os.rename(data_folder + folder_path + folder, data_folder + folder_path + new_name)
